@@ -3,13 +3,16 @@ import Vapor
 
 @main
 struct ComponentA {
-    static func main() async throws {
+    static func main() throws {
         let env = try Environment.detect()
         
         let app = Application(env)
         defer { app.shutdown() }
         
-        try Routes.register(app: app)
+        app.http.client.configuration.timeout = .init(connect: .seconds(60), read: .seconds(60))
+        app.http.server.configuration.port = 3000
+        
+        try Routes().register(app: app)
         try app.run()
     }
 }
